@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Display from './diplay'
 import Keyboard from './keyboard'
+import Recargas from './recargas'
 
 interface Series {
   1000: number
@@ -27,6 +28,7 @@ export default function Cajero () {
   }
 
   const [texto, setTexto] = useState('')
+  const [showRecarga, setShowRecarga] = useState(false)
   const [isError, setIsError] = useState(false)
 
   const validarRetiro = (monto: number): boolean => {
@@ -133,11 +135,15 @@ export default function Cajero () {
     setIsError(false)
     setTexto(texto + key)
   }
+  const hadleRecarga = (recarga: boolean) => {
+    setShowRecarga(recarga)
+  }
   return (
     <div className="border p-3 bg-gray-500">
       <div className="border p-5 bg-gray-400">
-        <Display texto={texto} error={isError} />
-        <Keyboard keyPress={sendKey} />
+        <Display texto={texto} error={isError} onRecarga={hadleRecarga} />
+
+        {showRecarga ? <Keyboard keyPress={sendKey} /> : <Recargas />}
       </div>
     </div>
   )
