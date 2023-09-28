@@ -143,7 +143,7 @@ export default function Cajero () {
       <div className="border p-5 bg-gray-400">
         <Display texto={texto} error={isError} onRecarga={hadleRecarga} />
 
-        {showRecarga ? <Keyboard keyPress={sendKey} /> : <Recargas />}
+        {showRecarga ? <Recargas /> : <Keyboard keyPress={sendKey} /> }
       </div>
     </div>
   )
