@@ -122,6 +122,7 @@ export default function Cajero () {
 
     if (key === 'Cancelar') {
       pressCancelar()
+      setIsError(false)
       return
     }
 
@@ -129,6 +130,7 @@ export default function Cajero () {
       pressEnter(parseInt(texto))
       return
     }
+    setIsError(false)
     setTexto(texto + key)
   }
   return (
