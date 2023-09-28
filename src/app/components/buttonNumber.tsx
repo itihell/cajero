@@ -1,10 +1,12 @@
 'use client'
 export default function ButtonNumber ({
   texto,
-  keyPress
+  keyPress,
+  error
 }: {
   texto: string
   keyPress?: any
+  error?: boolean
 }) {
   const sendKey = (key: string) => {
     keyPress(key)

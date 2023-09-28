@@ -1,7 +1,7 @@
 'use client'
 import ButtonNumber from './buttonNumber'
 
-export default function Keyboard ({ keyPress }: { keyPress?: any }) {
+export default function Keyboard ({ keyPress, error }: { keyPress?: any, error?: boolean }) {
   const sendKey = (key: string) => {
     keyPress(key)
     console.log(`keyborad ${key}`)

@@ -17,9 +17,8 @@ const saldo: Series = {
   200: 4,
   100: 4
 }
+let sumaRetiro: number = 0
 export default function Cajero () {
-  let sumaRetiro: number = 0
-
   const retiros: Series = {
     1000: 0,
     500: 0,
@@ -28,6 +27,26 @@ export default function Cajero () {
   }
 
   const [texto, setTexto] = useState('')
+  const [isError, setIsError] = useState(false)
+
+  const validarRetiro = (monto: number): boolean => {
+    if (monto % 1000 === 0) {
+      return true
+    }
+    if (monto % 500 === 0) {
+      return true
+    }
+
+    if (monto % 200 === 0) {
+      return true
+    }
+
+    if (monto % 100 === 0) {
+      return true
+    }
+
+    return false
+  }
 
   const getRetiros = (monto: number) => {
     if (saldo[1000] > 0 && sumaRetiro < monto && monto >= 1000) {
@@ -63,6 +82,16 @@ export default function Cajero () {
   }
 
   const pressEnter = (texto: number) => {
+    console.log('pressEnter ' + isError)
+
+    const hasError = !validarRetiro(texto)
+
+    if (hasError) {
+      setTexto('No se puede retirar ese monto')
+      sumaRetiro = 1
+      setIsError(true)
+      return true
+    }
     const montoRetirar = getRetiros(texto)
     console.log(montoRetirar, saldo, retiros)
 
@@ -81,6 +110,16 @@ export default function Cajero () {
   }
 
   const sendKey = (key: string) => {
+    console.log('suamRetiro ', sumaRetiro)
+
+    if (sumaRetiro > 0) {
+      setTimeout(() => {
+        setTexto('')
+        sumaRetiro = 0
+        console.log('Limpiar pantalla')
+      }, 50)
+    }
+
     if (key === 'Cancelar') {
       pressCancelar()
       return
@@ -95,7 +134,7 @@ export default function Cajero () {
   return (
     <div className="border p-3 bg-gray-500">
       <div className="border p-5 bg-gray-400">
-        <Display texto={texto} />
+        <Display texto={texto} error={isError} />
         <Keyboard keyPress={sendKey} />
       </div>
     </div>
