@@ -1,8 +1,6 @@
 'use client'
 let showRecarga: boolean = true
 export default function Display ({ texto, error, onRecarga }: { texto?: string, error: boolean, onRecarga?: any }) {
-  console.log('display ' + error)
-
   const classError = error ? 'text-white bg-red-600' : 'text-black bg-white'
   return (
     <div className="border p-1">
