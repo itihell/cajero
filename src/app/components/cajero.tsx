@@ -4,15 +4,9 @@ import { useState } from 'react'
 import Display from './diplay'
 import Keyboard from './keyboard'
 import Recargas from './recargas'
+import { type Series } from '../interfaces/series'
 
-interface Series {
-  1000: number
-  500: number
-  200: number
-  100: number
-}
-
-const saldo: Series = {
+let saldo: Series = {
   1000: 10,
   500: 10,
   200: 4,
@@ -27,65 +21,53 @@ export default function Cajero () {
     100: 0
   }
 
+  const [saldos, setSaldos] = useState<Series>({ ...saldo })
   const [texto, setTexto] = useState('')
   const [showRecarga, setShowRecarga] = useState(false)
   const [isError, setIsError] = useState(false)
 
+  const recargar = (data: Series) => {
+    setSaldos({ ...data })
+    saldo = { ...data }
+  }
+
   const validarRetiro = (monto: number): boolean => {
-    if (monto % 1000 === 0) {
-      return true
-    }
-    if (monto % 500 === 0) {
-      return true
-    }
-
-    if (monto % 200 === 0) {
-      return true
-    }
-
-    if (monto % 100 === 0) {
-      return true
-    }
-
-    return false
+    return (
+      monto % 1000 === 0 ||
+      monto % 500 === 0 ||
+      monto % 200 === 0 ||
+      monto % 100 === 0
+    )
   }
 
   const getRetiros = (monto: number) => {
-    if (saldo[1000] > 0 && sumaRetiro < monto && monto >= 1000) {
-      sumaRetiro += 1000
-      saldo[1000] -= 1
-      retiros[1000] += 1
+    const retirarMonto = (denominacion: keyof Series) => {
+      if (
+        saldo[denominacion] > 0 &&
+        sumaRetiro < monto &&
+        sumaRetiro + denominacion <= monto
+      ) {
+        sumaRetiro += denominacion
+        saldo[denominacion] -= 1
+        retiros[denominacion] += 1
+      }
     }
 
-    if (saldo[500] > 0 && sumaRetiro < monto && monto >= 500) {
-      sumaRetiro += 500
-      saldo[500] -= 1
-      retiros[500] += 1
-    }
+    retirarMonto(1000)
+    retirarMonto(500)
+    retirarMonto(200)
+    retirarMonto(100)
 
-    if (saldo[200] > 0 && sumaRetiro < monto && monto >= 200) {
-      sumaRetiro += 200
-      saldo[200] -= 1
-      retiros[200] += 1
-    }
-
-    if (saldo[100] > 0 && sumaRetiro < monto && monto >= 100) {
-      sumaRetiro += 100
-      saldo[100] -= 1
-      retiros[100] += 1
-    }
-
-    // TODO: Condicion para validar la recursividad
     if (sumaRetiro < monto) {
       getRetiros(monto)
     }
+
+    setSaldos({ ...saldo })
 
     return sumaRetiro
   }
 
   const pressEnter = (texto: number) => {
-    console.log('pressEnter ' + isError)
-
     const hasError = !validarRetiro(texto)
 
     if (hasError) {
@@ -94,8 +76,7 @@ export default function Cajero () {
       setIsError(true)
       return true
     }
-    const montoRetirar = getRetiros(texto)
-    console.log(montoRetirar, saldo, retiros)
+    getRetiros(texto)
 
     const aRetirar = `
     [1000:${retiros[1000]}],
@@ -112,13 +93,10 @@ export default function Cajero () {
   }
 
   const sendKey = (key: string) => {
-    console.log('suamRetiro ', sumaRetiro)
-
     if (sumaRetiro > 0) {
       setTimeout(() => {
         setTexto('')
         sumaRetiro = 0
-        console.log('Limpiar pantalla')
       }, 50)
     }
 
@@ -143,7 +121,13 @@ export default function Cajero () {
       <div className="border p-5 bg-gray-400">
         <Display texto={texto} error={isError} onRecarga={hadleRecarga} />
 
-        {showRecarga ? <Recargas /> : <Keyboard keyPress={sendKey} /> }
+        {showRecarga
+          ? (
+          <Recargas recargar={recargar} saldo={saldos} />
+            )
+          : (
+          <Keyboard keyPress={sendKey} />
+            )}
       </div>
     </div>
   )
